@@ -1,3 +1,4 @@
+import 'package:brew_crew/shared/constants.dart';
 import "package:flutter/material.dart";
 import "../../services/auth.dart";
 
@@ -10,9 +11,11 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
   final AuthService _auth = AuthService();
+  final _formKey = GlobalKey<FormState>();
 
   String email = "";
   String password = "";
+  String error = "";
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +35,15 @@ class _SignInState extends State<SignIn> {
       body: Container(
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
         child: Form(
+          key: _formKey,
           child: Column(
             children: <Widget>[
               SizedBox(height: 20),
               TextFormField(
+               decoration: textInputDecoration.copyWith(hintText: "email"),
+                validator: (value) {
+                  return value.isEmpty ? "Enter a valid email" : null;
+                },
                 onChanged: (value) {
                   setState(() {
                     email = value;
@@ -44,7 +52,11 @@ class _SignInState extends State<SignIn> {
               ),
               SizedBox(height: 20),
               TextFormField(
+                decoration: textInputDecoration.copyWith(hintText: "password"),
                 obscureText: true,
+                validator: (value) {
+                  return value.isEmpty ? "Enter a password" : null;
+                },
                 onChanged: (value) {
                   setState(() {
                     password = value;
@@ -61,9 +73,23 @@ class _SignInState extends State<SignIn> {
                   ),
                 ),
                 onPressed: () async {
-                  await _auth.register(email, password);
+                  if (_formKey.currentState.validate()) {
+                    dynamic result = await _auth.userSignIn(email, password);
+                    if (result == null) {
+                      setState(() {
+                        error = "Unable to authenticate with given credentials";
+                      });
+                    }
+                  }
                 },
               ),
+              SizedBox(height: 12),
+              Text(
+                error,
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              )
             ],
           ),
         ),
