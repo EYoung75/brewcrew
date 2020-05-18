@@ -27,6 +27,16 @@ class AuthService {
     }
   }
 
+  Future register(String email, String password) async {
+
+    try {
+    await _auth.signInWithEmailAndPassword(email: email, password: password);
+    } catch(err) {
+      print(err);
+      return null;
+    }
+  }
+
   Future signOut() async {
     try {
       return await _auth.signOut();
