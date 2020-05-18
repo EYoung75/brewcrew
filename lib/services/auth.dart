@@ -28,11 +28,12 @@ class AuthService {
   }
 
   Future register(String email, String password) async {
-
     try {
-    await _auth.signInWithEmailAndPassword(email: email, password: password);
-    } catch(err) {
-      print(err);
+      AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      FirebaseUser user = result.user;
+      return _userfromFireBaseUser(user);
+    } catch (err) {
+      print(err.toString());
       return null;
     }
   }
